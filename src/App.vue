@@ -291,8 +291,6 @@ onMounted(load);
   color: #e5e7eb;
 }
 
-/* ANIMATION */
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -315,8 +313,6 @@ onMounted(load);
 .animate-rise-late {
   animation: fadeIn 0.7s ease-out 0.2s backwards;
 }
-
-/* HERO */
 
 .hero {
   display: flex;
