@@ -165,9 +165,8 @@ onMounted(load);
     <header class="hero animate-fade">
       <div class="hero-text">
         <p class="badge">BMKG · Talaga, Cikupa</p>
-        <h1>Monitoring Cuaca Realtime</h1>
+        <h1>Monitoring Cuaca</h1>
         <p class="subtitle">
-          Suhu, kelembaban udara, kondisi cuaca, dan kecepatan angin
           dari API BMKG, diperbarui setiap 3 jam.
         </p>
       </div>
@@ -245,8 +244,8 @@ onMounted(load);
     <!-- 24 JAM TERAKHIR -->
     <section class="panel animate-rise-late">
       <header class="panel-header">
-        <h2>Per jam – 24 jam terakhir</h2>
-        <p>Data setiap jam (berdasarkan waktu lokal BMKG).</p>
+        <h2>Data selama 24 jam terakhir</h2>
+        <p>(Perkiraan sampai 3 hari kedepan)</p>
       </header>
 
       <div class="table-wrapper">
@@ -289,6 +288,12 @@ onMounted(load);
   margin: 0 auto;
   background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
   color: #e5e7eb;
+  /* Center all table cells */
+  table th,
+  table td {
+    text-align: center !important;
+  }
+
 }
 
 @keyframes fadeIn {
