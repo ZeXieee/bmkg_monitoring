@@ -6,13 +6,14 @@ const API_URL =
   "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=36.03.18.2004";
 
 type DataPoint = {
-  timestamp: string; // ISO-like dari local_datetime
+  localDatetime: string; // ISO dari local_datetime BMKG
   temperature: number;
   humidity: number;
   windSpeed: number;
   condition: string;
   iconUrl?: string;
 };
+
 
 type Lokasi = {
   provinsi: string;
@@ -60,13 +61,13 @@ async function load() {
       analysisDate.value = raw.endsWith("Z") ? raw : `${raw}Z`;
     }
 
-    // Map ke DataPoint
+    // Map ke DataPoint (urutannya mengikuti urutan JSON BMKG)
     points.value = flat.map((item) => {
       const rawLocal: string = item.local_datetime; // "YYYY-MM-DD HH:mm:ss"
-      const isoLocal = rawLocal.replace(" ", "T") + "+07:00";
+      const isoLocal = rawLocal.replace(" ", "T") + "+07:00"; // jadi ISO
 
       return {
-        timestamp: isoLocal,
+        localDatetime: isoLocal,
         temperature: Number(item.t),
         humidity: Number(item.hu),
         windSpeed: Number(item.ws),
@@ -75,11 +76,8 @@ async function load() {
       };
     });
 
-    // Urutkan waktu naik
-    points.value.sort(
-      (a, b) =>
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
+// Tidak perlu sort lagi: urutan = urutan BMKG
+
   } catch (e: any) {
     console.error(e);
     error.value = e?.message ?? "Unknown error";
@@ -96,24 +94,15 @@ const lokasiText = computed(() => {
   return `${l.desa}, ${l.kecamatan}, ${l.kotkab}, ${l.provinsi}`;
 });
 
-const lastPoint = computed<DataPoint | null>(() => {
-  const arr = points.value;
-  if (!arr || arr.length === 0) {
-    return null;
-  }
-  // "!" di sini bilang ke TypeScript: ini pasti ada (bukan undefined)
-  return arr[arr.length - 1]!;
+// Semua titik cuaca dalam urutan BMKG
+const last24h = computed<DataPoint[]>(() => points.value);
+
+// Data untuk card = data paling atas (No 1)
+const currentData = computed<DataPoint | null>(() => {
+  if (!points.value.length) return null;
+  return points.value[0];
 });
 
-
-const last24h = computed<DataPoint[]>(() => {
-  if (!points.value.length) return [];
-  const cutoff = new Date();
-  cutoff.setHours(cutoff.getHours() - 24);
-  return points.value.filter(
-    (p) => new Date(p.timestamp).getTime() >= cutoff.getTime()
-  );
-});
 
 function avg(arr: number[]) {
   if (!arr.length) return NaN;
@@ -159,6 +148,7 @@ function fmt(value: number, digits: number) {
 onMounted(load);
 </script>
 
+
 <template>
   <div class="page">
     <!-- HERO -->
@@ -192,11 +182,11 @@ onMounted(load);
     </section>
 
     <!-- CARDS -->
-    <section class="cards-grid animate-rise" v-if="lastPoint">
+    <section class="cards-grid animate-rise" v-if="currentData">
       <article class="card">
         <h2>Suhu</h2>
         <p class="card-value">
-          {{ lastPoint.temperature.toFixed(1) }}<span class="unit">°C</span>
+          {{ currentData.temperature.toFixed(1) }}<span class="unit">°C</span>
         </p>
         <p class="card-sub">
           Rata-rata 24 jam: {{ fmt(avg24h.temperature, 1) }}°C
@@ -206,7 +196,7 @@ onMounted(load);
       <article class="card">
         <h2>Kelembaban Udara</h2>
         <p class="card-value">
-          {{ lastPoint.humidity.toFixed(0) }}<span class="unit">%</span>
+          {{ currentData.humidity.toFixed(0) }}<span class="unit">%</span>
         </p>
         <p class="card-sub">
           Rata-rata 24 jam: {{ fmt(avg24h.humidity, 0) }}%
@@ -216,7 +206,7 @@ onMounted(load);
       <article class="card">
         <h2>Kecepatan Angin</h2>
         <p class="card-value">
-          {{ lastPoint.windSpeed.toFixed(1) }}<span class="unit">
+          {{ currentData.windSpeed.toFixed(1) }}<span class="unit">
             km/jam
           </span>
         </p>
@@ -229,13 +219,13 @@ onMounted(load);
         <h2>Kondisi Cuaca</h2>
         <div class="condition-inner">
           <img
-            v-if="lastPoint.iconUrl"
-            :src="lastPoint.iconUrl"
+            v-if="currentData.iconUrl"
+            :src="currentData.iconUrl"
             alt="Ikon cuaca"
             class="condition-icon"
           />
           <p class="card-value-small">
-            {{ lastPoint.condition || "–" }}
+            {{ currentData.condition || "–" }}
           </p>
         </div>
       </article>
@@ -261,9 +251,9 @@ onMounted(load);
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(p, idx) in last24h" :key="p.timestamp">
+            <tr v-for="(p, idx) in last24h" :key="p.localDatetime">
               <td>{{ idx + 1 }}</td>
-              <td>{{ formatHour(p.timestamp) }}</td>
+              <td>{{ formatHour(p.localDatetime) }}</td>
               <td>{{ p.temperature.toFixed(1) }}</td>
               <td>{{ p.humidity.toFixed(0) }}</td>
               <td>{{ p.windSpeed.toFixed(1) }}</td>
@@ -292,6 +282,10 @@ onMounted(load);
   table th,
   table td {
     text-align: center !important;
+  }
+  td:last-child,
+  th:last-child {
+    text-align: left;
   }
 
 }
