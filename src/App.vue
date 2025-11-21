@@ -234,7 +234,7 @@ onMounted(load);
     <!-- 24 JAM TERAKHIR -->
     <section class="panel animate-rise-late">
       <header class="panel-header">
-        <h2>Data selama 24 jam terakhir</h2>
+        <h2>Data selama 24 jam</h2>
         <p>(Perkiraan sampai 3 hari kedepan)</p>
       </header>
 
