@@ -97,11 +97,12 @@ const lokasiText = computed(() => {
 // Semua titik cuaca dalam urutan BMKG
 const last24h = computed<DataPoint[]>(() => points.value);
 
-// Data untuk card = data paling atas (No 1)
-const currentData = computed<DataPoint | null>(() => {
+// ✅ versi benar
+const currentData = computed((): DataPoint | null => {
   if (!points.value.length) return null;
-  return points.value[0];
+  return points.value[0]!;
 });
+
 
 
 function avg(arr: number[]) {
@@ -119,6 +120,15 @@ const avg24h = computed(() => {
 });
 
 // ---------- Formatter ----------
+function formatDateOnly(dt: string) {
+  const d = new Date(dt);
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 
 function formatDate(dt: string | null) {
   if (!dt) return "–";
@@ -243,16 +253,18 @@ onMounted(load);
           <thead>
             <tr>
               <th>No</th>
+              <th>Tanggal</th>
               <th>Waktu</th>
               <th>Suhu (°C)</th>
               <th>Kelembaban (%)</th>
               <th>Kecepatan Angin (km/jam)</th>
-              <th>Kondisi</th>
+              <th>Kondisi Cuaca</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(p, idx) in last24h" :key="p.localDatetime">
               <td>{{ idx + 1 }}</td>
+              <td>{{ formatDateOnly(p.localDatetime) }}</td>
               <td>{{ formatHour(p.localDatetime) }}</td>
               <td>{{ p.temperature.toFixed(1) }}</td>
               <td>{{ p.humidity.toFixed(0) }}</td>
