@@ -55,9 +55,9 @@ async function load() {
     const flat: any[] = ([] as any[]).concat(...cuacaNested);
 
     // Ambil analysis_date pertama (UTC, tanpa zona → anggap Z)
-    const firstWithAnalysis = flat.find((x) => x.analysis_date);
-    if (firstWithAnalysis?.analysis_date) {
-      const raw: string = firstWithAnalysis.analysis_date;
+    const firstWithAnalysis = flat.find((x) => x.local_datetime);
+    if (firstWithAnalysis?.local_datetime) {
+      const raw: string = firstWithAnalysis.local_datetime;
       analysisDate.value = raw.endsWith("Z") ? raw : `${raw}Z`;
     }
 
@@ -281,7 +281,7 @@ onMounted(load);
   /* Center all table cells */
   table th,
   table td {
-    text-align: center !important;
+    text-align: center;
   }
   td:last-child,
   th:last-child {
@@ -419,17 +419,19 @@ onMounted(load);
 .card {
   background: radial-gradient(circle at top left, #0f172a 0, #020617 75%);
   border-radius: 1.1rem;
-  padding: 1.1rem 1rem;
+  padding: 1.4rem 1rem 1.1rem;
   border: 1px solid rgba(148, 163, 184, 0.32);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.7);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;       /* rata tengah */
-  text-align: center;        /* rata tengah */
+  align-items: center;
+  text-align: center;
+  justify-content: flex-start;   /* judul nempel bagian atas */
+  gap: 0.6rem;                   /* jarak rapi antara judul, angka, dst */
   transition: transform 0.18s ease-out, box-shadow 0.18s ease-out,
     border-color 0.18s ease-out;
 }
+
 
 .card:hover {
   transform: translateY(-3px);
@@ -467,7 +469,7 @@ onMounted(load);
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  margin-top: 0.2rem;
+  margin-top:1rem;
 }
 
 .condition-icon {
