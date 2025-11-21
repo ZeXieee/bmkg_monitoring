@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 
-// Ganti adm4 kalau mau lokasi lain
 const API_URL =
-  "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=36.03.18.2004";
+  "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4=33.74.15.1008";
 
 type DataPoint = {
-  localDatetime: string; // ISO dari local_datetime BMKG
+  localDatetime: string; 
   temperature: number;
   humidity: number;
   windSpeed: number;
@@ -46,7 +45,6 @@ async function load() {
       };
     }
 
-    // Flatten cuaca 3D → 1D
     const cuacaNested: any[][] =
       json.data && json.data[0] && Array.isArray(json.data[0].cuaca)
         ? json.data[0].cuaca
@@ -164,7 +162,7 @@ onMounted(load);
     <!-- HERO -->
     <header class="hero animate-fade">
       <div class="hero-text">
-        <p class="badge">BMKG · Talaga, Cikupa</p>
+        <p class="badge">BMKG · TambakAji, Ngaliyan</p>
         <h1>Monitoring Cuaca</h1>
         <p class="subtitle">
           dari API BMKG, diperbarui setiap 3 jam.
